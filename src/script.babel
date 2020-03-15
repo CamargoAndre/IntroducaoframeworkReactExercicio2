@@ -1,0 +1,143 @@
+class Dado extends React.Component{
+  render(){
+    return(
+      <button className="dado">{this.props.value}</button>
+    );
+  }  
+}
+
+class Tabuleiro extends React.Component{
+  
+  //adicionar construtor
+  constructor (props){
+    super(props);
+    this.state = {
+      dados:Array(2).fill(null),
+      aposta: 0,
+      vitoria: 0,
+      derrota: 0
+    };
+  }
+  //metodoDado
+  renderizarDado(i){
+    return(
+      <Dado value={this.state.dados[i]} />
+    );
+  }
+  
+  jogarDados(){
+    const dados = this.state.dados.slice();
+    const aposta = this.state.aposta;
+    
+    for(let i=0; i< 3; i++){
+      dados[i] = random();
+    }
+    this.setState({
+      dados:dados,
+    });
+    
+    const vitoria = this.state.vitoria;
+    const derrota = this.state.derrota;
+    
+    if(calcularVitoria(dados, aposta)){
+      
+      this.setState({vitoria:vitoria+1});
+    }else{
+      
+      this.setState({derrota:derrota+1});
+      
+    }
+  
+  }
+  
+  render(){
+    return(
+      <div>
+        <div className="status">{status}</div>
+        <div className="jogador">{"Aposta: "}
+         <input onInput={(e) => this.setState({aposta: e.target.value})} type="text" className="aposta" id="inputAposta"/>
+        </div>
+        <div>
+          <table className="tabela">
+            <thead>
+              <th>{"DADO 1"}</th>
+              <th>{"DADO 2"}</th>
+            </thead>
+            <tbody>
+              <td>{this.renderizarDado(0)}</td>
+              <td>{this.renderizarDado(1)}</td>
+            </tbody>
+          </table>
+        </div>
+        <div>
+          <table>
+            <tr>
+              <td><button onClick={() => this.jogarDados()}> {'jogar'} </button> </td>
+              <td><button onClick={() => 
+                    this.setState({
+                      dados:Array(2).fill(null), 
+                      aposta:0,
+                      vitoria:0,
+                      derrota:0}
+                  )}> 
+                  {'Reset'} </button></td>
+            </tr>
+          </table>
+        </div>
+        <div>
+          <ol>{"Vitoria: " + this.state.vitoria}</ol>
+          <ol>{"Derrota: " + this.state.derrota}</ol>
+        </div>
+      </div>  
+    );
+  }  
+}
+
+class Jogo extends React.Component{
+  render(){
+    return(
+      <div className="game">
+        <div className="game-board">
+          <Tabuleiro dados={Array(2).fill().map((value, pos) => pos)} />
+        </div>
+      </div>
+    );
+  }
+}
+
+//--------------------------------------------------------
+// Funçao para verificar se acertou ou errou
+function calcularVitoria(dados, aposta){
+   
+  const somaDados = dados[0] + dados[1];
+  const numero = parseInt(aposta)
+  
+  if(somaDados == numero){
+    
+    return 1;
+    
+  }else{
+    
+    return 0;
+  }  
+}
+
+
+// função para gerar numero random dos dados 
+function random(){
+  let r;
+  return r = getRandomInt(1, 7);
+}
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min)) + min;
+}
+
+
+//--------------------------------------------------------
+
+ReactDOM.render(
+  <Jogo />,
+  document.getElementById("root")
+);
